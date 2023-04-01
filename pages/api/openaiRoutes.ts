@@ -1,6 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
 import nextSession from "next-session";
+import { YoutubeTranscript } from "youtube-transcript";
+
+type resData = {
+  text: string;
+};
+
+interface GenerateApiRequest extends NextApiRequest {
+  body: {
+    prompt: string;
+  };
+}
 
 const getSession = nextSession();
 
@@ -8,18 +19,19 @@ const openaiConfig = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-let YouTubeTranscript: string = "Can you help me with something?";
-
 const openai = new OpenAIApi(openaiConfig);
 
 export default async function sendMessage(
-  req: NextApiRequest,
-  res: NextApiResponse
+  req: GenerateApiRequest,
+  res: NextApiResponse<resData>
 ) {
+  const transcriptData = await YoutubeTranscript.fetchTranscript('I14_HrJktIs')
+  let transcriptText = transcriptData.map(({ text }) => text).join(" ")
+
   const session = await getSession(req, res);
   if (!session.chatHistory || session.chatHistory === null) {
     session.chatHistory = [
-      { role: "system", content: "You are a helpful assistant." }, { role: "user", content: YouTubeTranscript }
+      { role: "system", content: "You are a helpful assistant." }, {role: "user", content: transcriptText }
     ];
   }
 
@@ -48,8 +60,6 @@ export default async function sendMessage(
     content: `${completionResponse}`,
   });
 
-  console.log(session.chatHistory)
-
-  res.setHeader('Content-Type', 'application/json');
+  res.setHeader("Content-Type", "application/json");
   res.end(JSON.stringify({ text: completionResponse }));
 }
