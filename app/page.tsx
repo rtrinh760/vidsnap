@@ -55,11 +55,11 @@ const Nav: React.FC<NavProps> = () => {
 
 export type Message = {
   prompt: string;
-}
+};
 
 export type Link = {
   link: string;
-}
+};
 
 const ChatMessage = ({ text, messenger }: MessageProps) => {
   const isUser = messenger === Messenger.User;
@@ -93,7 +93,7 @@ const ChatInput = ({ onSubmit, disabled }: InputProps) => {
   // post link to openai to get transcript
   // set messages to empty
   // use custom types to detect if it is a link or message
-    // set the post type in this case
+  // set the post type in this case
 
   return (
     <div className="bg-white border-2 p-2 rounded-lg flex justify-center h-full">
@@ -163,9 +163,9 @@ const LinkInput = ({ onSubmit }: InputProps) => {
       </button>
     </div>
   );
-}
+};
 
-const VideoPlayer = ({videoId, onReady, opts }: YouTubeProps) => {
+const VideoPlayer = ({ videoId, onReady, opts }: YouTubeProps) => {
   const onPlayerReady: typeof onReady = (event) => {
     // access to player in all event handlers via event.target
     event.target.pauseVideo();
@@ -181,18 +181,14 @@ const VideoPlayer = ({videoId, onReady, opts }: YouTubeProps) => {
   };
 
   return (
-    <YouTube
-      videoId={videoId}
-      opts={videoOptions}
-      onReady={onPlayerReady}
-    />
+    <YouTube videoId={videoId} opts={videoOptions} onReady={onPlayerReady} />
   );
 };
 
 export default function Home() {
   const [messages, setMessages, messagesRef] = useState<MessageProps[]>([]);
   const [loading, setLoading] = useState(false);
-  const [videoId, setVideoId] = useState("")
+  const [videoId, setVideoId] = useState("");
 
   const queryApi = async (input: string) => {
     setLoading(true);
@@ -266,8 +262,10 @@ export default function Home() {
       </nav>
       <div className="flex-grow flex flex-row">
         <div className="flex-grow-0 flex-shrink-0 w-1/2 py-10 pl-10">
-          {videoId.length == 0 && <LinkInput onSubmit={(input: string) => setVideoId(input)} />}
-        {videoId.length != 0 && <VideoPlayer videoId={videoId} />}
+          {videoId.length == 0 && (
+            <LinkInput onSubmit={(input: string) => setVideoId(input)} />
+          )}
+          {videoId.length != 0 && <VideoPlayer videoId={videoId} />}
         </div>
 
         <div className="flex-grow flex-shrink-0 max-w-2xl bg-gray-200 rounded-lg p-4 flex flex-col gap-4 overflow-y-auto">
@@ -288,6 +286,11 @@ export default function Home() {
               onSubmit={(input: string) => queryApi(input)}
               disabled={loading}
             />
+              <QuizButton
+                onClick={() => queryApiOnClick()}
+                disabled={loading}
+              />
+            2
           </div>
         </div>
       </div>
