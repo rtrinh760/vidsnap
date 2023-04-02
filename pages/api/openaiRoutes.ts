@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
 import nextSession from "next-session";
 import { YoutubeTranscript } from "youtube-transcript";
-import { Message, Link } from "@/app/page";
 
 type resData = {
   text: string;
@@ -11,6 +10,7 @@ type resData = {
 interface GenerateApiRequest extends NextApiRequest {
   body: {
     prompt: string;
+    isLink: boolean;
   };
 }
 
@@ -26,30 +26,32 @@ export default async function sendMessage(
   req: GenerateApiRequest,
   res: NextApiResponse<resData>
 ) {
-  const transcriptData = await YoutubeTranscript.fetchTranscript("br7tS1t2SFE");
-  let transcriptText = transcriptData.map(({ text }) => text).join(" ");
 
   const session = await getSession(req, res);
-  if (!session.chatHistory || session.chatHistory === null) {
-    session.chatHistory = [
-      { role: "system", content: "You are a helpful assistant." },
-      {
-        role: "user",
-        content:
-          `I will give you the transcript of a YouTube video. 
-          You will analyze it and provide information based on user requests. Here is the transcript: \n` +
-          transcriptText,
-      },
-    ];
+
+  if (req.body.isLink) {
+    const transcriptData = await YoutubeTranscript.fetchTranscript(
+      req.body.prompt
+    );
+    let transcriptText = transcriptData.map(({ text }) => text).join(" ");
+
+    if (!session.chatHistory || session.chatHistory === null) {
+      session.chatHistory = [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: transcriptText },
+      ];
+    }
   }
 
-  let prompt: string = req.body.prompt;
-
-  if (!prompt || prompt === "") {
-    prompt = "Say Please enter a prompt so I may be able to assist you.";
+  else {
+    let prompt: string = req.body.prompt;
+  
+    if (!prompt || prompt === "") {
+      prompt = "Say Please enter a prompt so I may be able to assist you.";
+    }
+    session.chatHistory.push({ role: "user", content: `${prompt}` });
   }
 
-  session.chatHistory.push({ role: "user", content: `${prompt}` });
 
   // https://platform.openai.com/docs/api-reference/chat/create
   const completionOutput = await openai.createChatCompletion({

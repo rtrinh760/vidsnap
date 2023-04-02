@@ -3,12 +3,10 @@ import "./globals.css";
 import { KeyboardEvent } from "react";
 import useState from "react-usestateref";
 import user from "../public/user.svg";
-import vercel from "../public/vercel.svg";
 import Image from "next/image";
-import botImage from "../public/openai-logo.svg"
+import botImage from "../public/openai-logo.svg";
 import YouTube, { YouTubeProps } from "react-youtube";
-
-//import logo from "../public/logo.svg";"Don't have one yet"
+import getVideoId from "get-video-id";
 
 enum Messenger {
   User = "User",
@@ -39,8 +37,8 @@ const Nav: React.FC<NavProps> = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
-            <h1 className="text-black body-font font-poppins font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-300 text-4xl">
-            🔥 vidsnap.ai
+            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-tl from-purple-400 via-blue-400 to-blue-600">
+              🔥 vidsnap.ai
             </h1>
           </div>
           <div className="ml-auto">
@@ -65,37 +63,33 @@ export type Link = {
 const ChatMessage = ({ text, messenger }: MessageProps) => {
   const isUser = messenger === Messenger.User;
 
-  if(isUser){
+  if (isUser) {
     return (
       <div
         className={`max-w-2xl mb-4 ${
-          isUser ? "ml-auto bg-blue-600 text-white" : "mr-auto bg-violet-600 text-white"
+          isUser
+            ? "ml-auto bg-blue-600 text-white"
+            : "mr-auto bg-violet-600 text-white"
         } rounded-lg p-3 flex gap-4 items-center whitespace-pre-wrap`}
       >
-            <Image
-            src={user} alt="user-profile" width = {25} height = {25}
-          />
+        <Image src={user} alt="user-profile" width={25} height={25} />
+        <p className="text-white">{text}</p>
+      </div>
+    );
+  } else {
+    return (
+      <div
+        className={`max-w-2xl mb-4 ${
+          isUser
+            ? "ml-auto bg-blue-600 text-white"
+            : "mr-auto bg-violet-600 text-white"
+        } rounded-lg p-3 flex gap-4 items-center whitespace-pre-wrap`}
+      >
+        <Image src={botImage} alt="user-profile" width={25} height={25} />
         <p className="text-white">{text}</p>
       </div>
     );
   }
-
-  else{
-    return (
-      <div
-        className={`max-w-2xl mb-4 ${
-          isUser ? "ml-auto bg-blue-600 text-white" : "mr-auto bg-violet-600 text-white"
-        } rounded-lg p-3 flex gap-4 items-center whitespace-pre-wrap`}
-      >
-            <Image
-            src={botImage} alt="user-profile" width = {25} height = {25}
-          />
-        <p className="text-white">{text}</p>
-      </div>
-    );
-  }
-  
-
 };
 
 const ChatInput = ({ onSubmit, disabled }: InputProps) => {
@@ -125,7 +119,7 @@ const ChatInput = ({ onSubmit, disabled }: InputProps) => {
         onChange={(e) => setInput(e.target.value)}
         className="w-full px-3 text-gray-800 rounded-lg focus:outline-none font-semibold py-2 border shadow mr-1"
         type="text"
-        placeholder="Enter a prompt"
+        placeholder="Enter Prompt"
         onKeyDown={handleEnterKey}
       />
       <button
@@ -145,9 +139,37 @@ const QuizButton = ({ onClick, disabled }: ButtonProps) => {
       <button
         onClick={onClick}
         disabled={disabled}
-        className="pl-4 text-white bg-yellow-500 hover:bg-yellow-600 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+        className="pl-4 text-white bg-yellow-500 hover:bg-yellow-600 font-semibold py-2 px-4 border border-gray-400 rounded shadow transition-colors duration-300"
       >
         Quiz me!
+      </button>
+    </div>
+  );
+};
+
+const MCButton = ({ onClick, disabled }: ButtonProps) => {
+  return (
+    <div>
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        className="pl-4 text-white bg-green-500 hover:bg-green-600 font-semibold py-2 px-4 border border-gray-400 rounded shadow transition-colors duration-300"
+      >
+        Quiz me! (MC)
+      </button>
+    </div>
+  );
+};
+
+const SummarizeButton = ({ onClick, disabled }: ButtonProps) => {
+  return (
+    <div>
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        className="pl-4 text-white bg-orange-500 hover:bg-orange-600 font-semibold py-2 px-4 border border-gray-400 rounded shadow transition-colors duration-300"
+      >
+        Summarize!
       </button>
     </div>
   );
@@ -157,7 +179,13 @@ const LinkInput = ({ onSubmit }: InputProps) => {
   const [input, setInput] = useState("");
 
   const submitInput = () => {
-    onSubmit(input);
+    if (!input) return;
+
+    const videoId = getVideoId(input).id;
+
+    if (!videoId) return;
+
+    onSubmit(videoId);
     setInput("");
   };
 
@@ -172,14 +200,14 @@ const LinkInput = ({ onSubmit }: InputProps) => {
       <input
         value={input}
         onChange={(e) => setInput((e.target as HTMLInputElement).value)}
-        className="w-full px-3 text-gray-800 focus:outline-none font-semibold py-2 border shadow"
+        className="w-full px-3 text-gray-800 rounded-lg focus:outline-none font-semibold py-2 border shadow mr-1"
         type="text"
         placeholder="Enter YouTube Link"
         onKeyDown={(e: KeyboardEvent) => handleEnterKey(e)}
       />
       <button
         onClick={submitInput}
-        className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300"
+        className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 mr-1"
         disabled={!input}
       >
         Send
@@ -212,7 +240,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [videoId, setVideoId] = useState("");
 
-  const queryApi = async (input: string) => {
+  const queryApi = async (input: string, isLink: boolean=false) => {
     setLoading(true);
 
     const userMessage: MessageProps = {
@@ -221,13 +249,15 @@ export default function Home() {
       key: new Date().getTime(),
     };
 
-    setMessages([...messagesRef.current, userMessage]);
+    if(!isLink) {
+      setMessages([...messagesRef.current, userMessage]);
+    }
     const gptResponse = await fetch("/api/openaiRoutes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ prompt: input }),
+      body: JSON.stringify({ prompt: input, isLink: isLink }),
     }).then((gptResponse) => gptResponse.json());
 
     setLoading(false);
@@ -238,22 +268,20 @@ export default function Home() {
         messenger: Messenger.AI,
         key: new Date().getTime(),
       };
-      setMessages([...messagesRef.current, gptMessage]);
+
+      if(!isLink) {
+        setMessages([...messagesRef.current, gptMessage]);
+      }
+
     } else {
       return new Response("Error occurred.", { status: 400 });
     }
   };
 
-  const queryApiOnClick = async () => {
+  const queryApiOnQuizButton = async () => {
     setLoading(true);
     const prompt: string = `Please generate a question from the information of the video transcript that 
           tests my knowledge. I will give you my answer in the next request.`;
-
-    const userMessage: MessageProps = {
-      text: prompt,
-      messenger: Messenger.User,
-      key: new Date().getTime(),
-    };
 
     const gptResponse = await fetch("/api/openaiRoutes", {
       method: "POST",
@@ -277,24 +305,101 @@ export default function Home() {
     }
   };
 
+  const queryApiOnMCButton = async () => {
+    setLoading(true);
+    const prompt: string = `Please generate a multiple-choice question with 4 options that 
+          tests my knowledge about the video. I will give you my answer in the next request.`;
+
+    const gptResponse = await fetch("/api/openaiRoutes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt: prompt }),
+    }).then((gptResponse) => gptResponse.json());
+
+    setLoading(false);
+
+    if (gptResponse.text) {
+      const gptMessage: MessageProps = {
+        text: gptResponse.text,
+        messenger: Messenger.AI,
+        key: new Date().getTime(),
+      };
+      setMessages([...messagesRef.current, gptMessage]);
+    } else {
+      return new Response("Error occurred.", { status: 400 });
+    }
+  };
+
+  const queryApiOnSummarizeButton = async () => {
+    setLoading(true);
+    const prompt: string = `Please generate a summary of the transcript that highlights 5 key points.`;
+
+    const gptResponse = await fetch("/api/openaiRoutes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt: prompt }),
+    }).then((gptResponse) => gptResponse.json());
+
+    setLoading(false);
+
+    if (gptResponse.text) {
+      const gptMessage: MessageProps = {
+        text: gptResponse.text,
+        messenger: Messenger.AI,
+        key: new Date().getTime(),
+      };
+      setMessages([...messagesRef.current, gptMessage]);
+    } else {
+      return new Response("Error occurred.", { status: 400 });
+    }
+  };
+
+  const queryYouTube = async (input: string) => {
+    setLoading(true);
+
+    setVideoId(input);
+
+    queryApi(input, true)
+
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 h-screen overflow-auto">
-      <nav >
+      <nav>
         <Nav />
       </nav>
       <div className="flex-grow flex flex-row h-full overflow-auto">
         <div className="flex-grow-0 flex-shrink-0 w-1/2 pl-10 mr-10 flex justify-center items-center">
           {videoId.length == 0 && (
-            <LinkInput onSubmit={(input: string) => setVideoId(input)} />
+            <LinkInput onSubmit={(input: string) => queryYouTube(input)} />
           )}
           {videoId.length != 0 && <VideoPlayer videoId={videoId} />}
         </div>
 
-        <div className="shadow-lg bg-gray-200 rounded-md p-4 flex flex-col overflow-x-hidden pl-10 overflow-y-scroll">
-          <QuizButton
-              onClick={() => queryApiOnClick()}
-              disabled={loading}
-            />
+        <div className="shadow-lg bg-gray-200 rounded-md p-4  flex flex-col gap-4 overflow-x-hidden pl-10 h-full overflow-y-scroll">
+          <div className="flex flex-row space-x-1 justify-center">
+            {videoId.length != 0 && (
+              <>
+                <QuizButton
+                  onClick={() => queryApiOnQuizButton()}
+                  disabled={loading}
+                />
+                <MCButton
+                  onClick={() => queryApiOnMCButton()}
+                  disabled={loading}
+                />
+                <SummarizeButton
+                  onClick={() => queryApiOnSummarizeButton()}
+                  disabled={loading}
+                />
+              </>
+            )}
+          </div>
           {messages.map((message: MessageProps) => (
             <ChatMessage
               key={message.key}
@@ -302,17 +407,27 @@ export default function Home() {
               messenger={message.messenger}
             />
           ))}
-          {messages.length == 0 && (
-            <p className="text-center text-2xl text-bold text-black">
-              Enter a prompt above to get started!
-            </p>
-          )}
+          <div className="flex h-screen justify-center items-center">
+            {messages.length == 0 && videoId.length != 0 && (
+              <p className="text-center text-2xl text-extrabold text-black">
+                Enter a prompt below or click one of the buttons above to get
+                started!
+              </p>
+            )}
+            {videoId.length == 0 && (
+              <p className="text-center text-2xl text-extrabold text-black
+              ">
+                Enter a link on the left to access the AI assistant.
+              </p>
+            )}
+          </div>
           <div className="mt-auto">
-            <ChatInput
-              onSubmit={(input: string) => queryApi(input)}
-              disabled={loading}
-            />
-          
+            {videoId.length != 0 && (
+              <ChatInput
+                onSubmit={(input: string) => queryApi(input)}
+                disabled={loading}
+              />
+            )}
           </div>
         </div>
       </div>
