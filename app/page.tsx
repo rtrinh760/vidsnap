@@ -278,11 +278,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100 h-screen">
+    <div className="min-h-screen flex flex-col bg-gray-100 h-full">
       <nav className="">
         <Nav />
       </nav>
-      <div className="flex-grow flex flex-row h-full">
+      <div className="flex-grow flex flex-row h-fit">
         <div className="flex-grow-0 flex-shrink-0 w-1/2 pl-10 mr-10 flex justify-center items-center">
           {videoId.length == 0 && (
             <LinkInput onSubmit={(input: string) => setVideoId(input)} />
@@ -290,7 +290,7 @@ export default function Home() {
           {videoId.length != 0 && <VideoPlayer videoId={videoId} />}
         </div>
 
-        <div className="flex-grow shadow-lg bg-gray-200 rounded-md p-4  flex flex-col gap-4 overflow-y-auto overflow-x-hidden pl-10 h-full overflow-y-scroll">
+        <div className="flex-grow shadow-lg bg-gray-200 rounded-md p-4 flex flex-col gap-4 overflow-y-auto overflow-x-hidden pl-10 h-fit overflow-y-scroll">
           <QuizButton
               onClick={() => queryApiOnClick()}
               disabled={loading}
