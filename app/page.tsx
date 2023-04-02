@@ -39,8 +39,8 @@ const Nav: React.FC<NavProps> = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
-            <h1 className="text-white body-font font-poppins font-extrabold bg-clip-text bg-gradient-to-r from-grey-100 to-grey-300 text-4xl">
-              🧻 vidsnap.ai
+            <h1 className="text-black body-font font-poppins font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-300 text-4xl">
+            🔥 vidsnap.ai
             </h1>
           </div>
           <div className="ml-auto">
@@ -278,11 +278,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100 h-screen">
-      <nav className="">
+    <div className="min-h-screen flex flex-col bg-gray-100 h-screen overflow-auto">
+      <nav >
         <Nav />
       </nav>
-      <div className="flex-grow flex flex-row h-full">
+      <div className="flex-grow flex flex-row h-full overflow-auto">
         <div className="flex-grow-0 flex-shrink-0 w-1/2 pl-10 mr-10 flex justify-center items-center">
           {videoId.length == 0 && (
             <LinkInput onSubmit={(input: string) => setVideoId(input)} />
@@ -290,7 +290,7 @@ export default function Home() {
           {videoId.length != 0 && <VideoPlayer videoId={videoId} />}
         </div>
 
-        <div className="flex-grow shadow-lg bg-gray-200 rounded-md p-4  flex flex-col gap-4 overflow-y-auto overflow-x-hidden pl-10 h-full overflow-y-scroll">
+        <div className="shadow-lg bg-gray-200 rounded-md p-4 flex flex-col overflow-x-hidden pl-10 overflow-y-scroll">
           <QuizButton
               onClick={() => queryApiOnClick()}
               disabled={loading}
