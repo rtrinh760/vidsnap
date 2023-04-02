@@ -5,6 +5,7 @@ import useState from "react-usestateref";
 import user from "../public/user.svg";
 import vercel from "../public/vercel.svg";
 import Image from "next/image";
+import botImage from "../public/openai-logo.svg"
 import YouTube, { YouTubeProps } from "react-youtube";
 
 //import logo from "../public/logo.svg";"Don't have one yet"
@@ -64,15 +65,37 @@ export type Link = {
 const ChatMessage = ({ text, messenger }: MessageProps) => {
   const isUser = messenger === Messenger.User;
 
-  return (
-    <div
-      className={`max-w-2xl mb-4 ${
-        isUser ? "ml-auto bg-blue-600 text-white" : "mr-auto bg-gray-200"
-      } rounded-lg p-4 flex gap-4 items-center whitespace-pre-wrap`}
-    >
-      <p className="text-black">{text}</p>
-    </div>
-  );
+  if(isUser){
+    return (
+      <div
+        className={`max-w-2xl mb-4 ${
+          isUser ? "ml-auto bg-blue-600 text-white" : "mr-auto bg-violet-600 text-white"
+        } rounded-lg p-3 flex gap-4 items-center whitespace-pre-wrap`}
+      >
+            <Image
+            src={user} alt="user-profile" width = {25} height = {25}
+          />
+        <p className="text-white">{text}</p>
+      </div>
+    );
+  }
+
+  else{
+    return (
+      <div
+        className={`max-w-2xl mb-4 ${
+          isUser ? "ml-auto bg-blue-600 text-white" : "mr-auto bg-violet-600 text-white"
+        } rounded-lg p-3 flex gap-4 items-center whitespace-pre-wrap`}
+      >
+            <Image
+            src={botImage} alt="user-profile" width = {25} height = {25}
+          />
+        <p className="text-white">{text}</p>
+      </div>
+    );
+  }
+  
+
 };
 
 const ChatInput = ({ onSubmit, disabled }: InputProps) => {
@@ -107,7 +130,7 @@ const ChatInput = ({ onSubmit, disabled }: InputProps) => {
       />
       <button
         onClick={submitInput}
-        className="ml-2 py-2 px-4 bg-blue-600 text-white rounded-lg disabled:bg-gray-400 disabled:text-gray-800"
+        className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300"
         disabled={!input}
       >
         Send
@@ -122,7 +145,7 @@ const QuizButton = ({ onClick, disabled }: ButtonProps) => {
       <button
         onClick={onClick}
         disabled={disabled}
-        className="pl-4 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+        className="pl-4 text-white bg-yellow-500 hover:bg-yellow-600 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
       >
         Quiz me!
       </button>
@@ -175,7 +198,6 @@ const VideoPlayer = ({ videoId, onReady, opts }: YouTubeProps) => {
     height: "365",
     width: "600",
     playerVars: {
-      // https://developers.google.com/youtube/player_parameters
       autoplay: 1,
     },
   };
@@ -268,7 +290,11 @@ export default function Home() {
           {videoId.length != 0 && <VideoPlayer videoId={videoId} />}
         </div>
 
-        <div className="flex-grow flex-shrink-0 max-w-2xl bg-gray-200 rounded-lg p-4 flex flex-col gap-4 overflow-y-auto">
+        <div className="flex-grow flex-shrink-0 max-w-2xl bg-gray-200 rounded-lg p-4 flex flex-col gap-4 overflow-y-auto pl-10">
+          <QuizButton
+              onClick={() => queryApiOnClick()}
+              disabled={loading}
+            />
           {messages.map((message: MessageProps) => (
             <ChatMessage
               key={message.key}
@@ -286,11 +312,7 @@ export default function Home() {
               onSubmit={(input: string) => queryApi(input)}
               disabled={loading}
             />
-              <QuizButton
-                onClick={() => queryApiOnClick()}
-                disabled={loading}
-              />
-            2
+          
           </div>
         </div>
       </div>
