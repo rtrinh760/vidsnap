@@ -8,6 +8,8 @@ import thirteen from "../public/thirteen.svg";
 import Image from "next/image";
 import YouTube, { YouTubeProps } from "react-youtube";
 
+//import logo from "../public/logo.svg";"Don't have one yet"
+
 enum Messenger {
   User = "User",
   AI = "AI",
@@ -24,22 +26,40 @@ interface InputProps {
   disabled: boolean;
 }
 
-const ChatMessage = ({ text, messenger }: MessageProps) => {
+interface NavProps {}
+
+const Nav: React.FC<NavProps> = () => {
   return (
-    <>
-      {messenger == Messenger.User && (
-        <div className="bg-white p-4 rounded-lg flex gap-4 items-center whitespace-pre-wrap">
-          <Image src={next} alt="next" height={32} width={32} />
-          <p className="text-black">{text}</p>
+    <nav className="bg-gray-900 shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex-shrink-0">
+            <h1 className="text-white body-font font-poppins font-extrabold bg-clip-text bg-gradient-to-r from-grey-100 to-grey-300 text-4xl">
+              🧻 vidsnap.ai
+            </h1>
+          </div>
+          <div className="ml-auto">
+            <button className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-300">
+              Log In
+            </button>
+          </div>
         </div>
-      )}
-      {messenger == Messenger.AI && (
-        <div className="bg-gray-200 p-4 rounded-lg flex gap-4 items-center whitespace-pre-wrap">
-          <Image src={vercel} alt="vercel" height={32} width={32} />
-          <p className="text-black">{text}</p>
-        </div>
-      )}
-    </>
+      </div>
+    </nav>
+  );
+};
+
+const ChatMessage = ({ text, messenger }: MessageProps) => {
+  const isUser = messenger === Messenger.User;
+
+  return (
+    <div
+      className={`max-w-2xl mb-4 ${
+        isUser ? "ml-auto bg-blue-600 text-white" : "mr-auto bg-gray-200"
+      } rounded-lg p-4 flex gap-4 items-center whitespace-pre-wrap`}
+    >
+      <p className="text-black">{text}</p>
+    </div>
   );
 };
 
@@ -47,6 +67,7 @@ const ChatInput = ({ onSubmit, disabled }: InputProps) => {
   const [input, setInput] = useState("");
 
   const submitInput = () => {
+    if (!input) return;
     onSubmit(input);
     setInput("");
   };
@@ -58,19 +79,22 @@ const ChatInput = ({ onSubmit, disabled }: InputProps) => {
   };
 
   return (
-    <div className="bg-white border-2 p-2 rounded-lg flex justify-center">
+    <div className="bg-white border-2 p-2 rounded-lg flex justify-center h-full">
       <input
         value={input}
-        onChange={(e) => setInput((e.target as HTMLInputElement).value)}
+        onChange={(e) => setInput(e.target.value)}
         className="w-full px-3 text-gray-800 rounded-lg focus:outline-none"
         type="text"
-        placeholder="Enter Prompt"
-        disabled={disabled}
-        onKeyDown={(e: KeyboardEvent) => handleEnterKey(e)}
+        placeholder="Enter a prompt"
+        onKeyDown={handleEnterKey}
       />
-      {/* { disabled && (
-        <svg></svg>
-      )} */}
+      <button
+        onClick={submitInput}
+        className="ml-2 py-2 px-4 bg-blue-600 text-white rounded-lg disabled:bg-gray-400 disabled:text-gray-800"
+        disabled={!input}
+      >
+        Send
+      </button>
     </div>
   );
 };
@@ -82,8 +106,8 @@ const VideoPlayer = ({ onReady, opts }: YouTubeProps) => {
   };
 
   const videoOptions: typeof opts = {
-    height: "292",
-    width: "480",
+    height: "365",
+    width: "600",
     playerVars: {
       // https://developers.google.com/youtube/player_parameters
       autoplay: 1,
@@ -136,34 +160,16 @@ export default function Home() {
   };
 
   return (
-    // <div class="relative grid w-full h-full overflow-hidden bg-gray-800 place-items-center">
-    //   <div class="z-10 w-full h-full p-12 backdrop-blur-5xl">
-    //     <!-- your content here -->
-    //   </div>
-      
-    //   <div class="absolute top-0 right-0 h-full w-full mix-blend-soft-light contrast-150 brightness-200 saturate-75 bg-gradient-to-tl from-violet-600 via-violet-700 to-sky-600">
-    //   </div>
-    // ,
-    //   <div class="absolute top-0 right-0 h-full w-full mix-blend-soft-light contrast-150 brightness-200 saturate-75 bg-gradient-to-bl from-indigo-700 via-blue-600 to-blue-500">
-    //   </div>
-    // </div>
-    <main className="relative mx-auto">
-      <nav className="sticky w-screen py-2 px-4 mix-blend-soft-light brightness-150 saturate-75 bg-gradient-to-tl from-violet-600 via-violet-700 to-sky-600 flex items-center justify-center">
-        <div className="flex">
-          <Image src={thirteen} alt="thirteen" height={128} width={128} />
-        </div>
+    <div className="min-h-screen flex flex-col bg-gray-100">
+      <nav className="">
+        <Nav />
       </nav>
-      <div className="flex justify-center pb-4">
-        <VideoPlayer />
-      </div>
-      <div className="flex mx-auto justify-center py-4">
-        <ChatInput
-          onSubmit={(input: string) => queryApi(input)}
-          disabled={loading}
-        />
-      </div>
-      <div className="max-w-2xl justify-center">
-        <div className="mt-5 px-4">
+      <div className="flex-grow flex flex-row">
+        <div className="flex-grow-0 flex-shrink-0 w-1/2 py-10 pl-10">
+          <VideoPlayer />
+        </div>
+
+        <div className="flex-grow flex-shrink-0 max-w-2xl bg-gray-200 rounded-lg p-4 flex flex-col gap-4 overflow-y-auto">
           {messages.map((message: MessageProps) => (
             <ChatMessage
               key={message.key}
@@ -172,12 +178,19 @@ export default function Home() {
             />
           ))}
           {messages.length == 0 && (
-            <p className="text-center text-2xl text-bold text-black">
-              Enter a prompt above or upload a pdf to get started!
+            <p className="text-center text-2xl font-bold text-gray-500">
+              Enter a prompt above to get started!
             </p>
           )}
+
+          <div className="mt-auto">
+            <ChatInput
+              onSubmit={(input: string) => queryApi(input)}
+              disabled={loading}
+            />
+          </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
