@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
 import nextSession from "next-session";
 import { YoutubeTranscript } from "youtube-transcript";
+import { Message, Link } from "@/app/page";
 
 type resData = {
   text: string;
@@ -25,13 +26,20 @@ export default async function sendMessage(
   req: GenerateApiRequest,
   res: NextApiResponse<resData>
 ) {
-  const transcriptData = await YoutubeTranscript.fetchTranscript('I14_HrJktIs')
-  let transcriptText = transcriptData.map(({ text }) => text).join(" ")
+  const transcriptData = await YoutubeTranscript.fetchTranscript("br7tS1t2SFE");
+  let transcriptText = transcriptData.map(({ text }) => text).join(" ");
 
   const session = await getSession(req, res);
   if (!session.chatHistory || session.chatHistory === null) {
     session.chatHistory = [
-      { role: "system", content: "You are a helpful assistant." }, {role: "user", content: transcriptText }
+      { role: "system", content: "You are a helpful assistant." },
+      {
+        role: "user",
+        content:
+          `I will give you the transcript of a YouTube video. 
+          You will analyze it and provide information based on user requests. Here is the transcript: \n` +
+          transcriptText,
+      },
     ];
   }
 
